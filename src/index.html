@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tu Tienda Online</title>
+    <link rel="icon" href="fireheart.png" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Pacifico&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #ff7b00;
+            --secondary-color: #ffffff;
+            --background-color: #000000;
+            --text-color: #ffffff;
+            --card-bg: #1a1a1a;
+            --header-bg: #ff7b00;
+            --panel-bg: #f1f1f1;
+        }
+
+        body.blanco {
+            --primary-color: #ff7b00;
+            --secondary-color: #000000;
+            --background-color: #ffffff;
+            --text-color: #333333;
+            --card-bg: #f8f9fa;
+            --header-bg: #ff7b00;
+            --panel-bg: #333333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            overflow-y: scroll;
+            height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--header-bg);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 10;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .theme-btn, .logout-btn {
+            background: var(--secondary-color);
+            color: var(--primary-color);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .theme-btn:hover, .logout-btn:hover {
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+
+        /* Welcome Section */
+        .welcome-container {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+
+        .welcome-title {
+            font-family: 'Lobster', cursive;
+      font-size: 70px;
+      color: orange;
+      text-transform: uppercase;
+      text-shadow: 
+        3px 3px 0 #ffcc00, 
+        
+      margin: 0;
+        }
+
+        /* Search Bar */
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            gap: 10px;
+        }
+
+        #search-input {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid var(--primary-color);
+            border-radius: 50px;
+            font-size: 1rem;
+            background: var(--card-bg);
+            color: var(--text-color);
+        }
+
+        #search-btn {
+            background: var(--primary-color);
+            color: var(--secondary-color);
+            border: none;
+            padding: 1rem 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        #search-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Products Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-img {
+            width: 100%;
+            height: 200px;
+            object-fit: contain;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+        }
+
+        .product-name {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-price {
+            color: var(--text-color);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .descuento {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: red;
+            color: white;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 30px;
+            font-size: 14px;
+            z-index: 2;
+        }
+
+        .comprar-btn {
+            display: none;
+            margin-top: 10px;
+            padding: 10px 15px;
+            background: green;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover .comprar-btn {
+            display: block;
+        }
+
+        .comprar-btn:hover {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            transform: scale(1.05);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Lightbox */
+        .lightbox {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            text-align: center;
+            padding-top: 60px;
+        }
+
+        .lightbox-content {
+            position: relative;
+            background: var(--card-bg);
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: modalAppear 0.3s ease;
+        }
+
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .lightbox-img {
+            max-width: 80%;
+            max-height: 70vh;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .lightbox-msg {
+            color: var(--text-color);
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 20px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 1.5rem;
+            font-weight: 500;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: var(--text-color);
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: var(--primary-color);
+        }
+
+        .controls {
+            margin-top: 10px;
+        }
+
+        .controls button {
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-size: 2rem;
+            margin: 0 20px;
+            cursor: pointer;
+        }
+
+        .controls button:hover {
+            color: var(--primary-color);
+        }
+
+        /* Panel */
+        .panel {
+            position: fixed;
+            top: 0;
+            left: 95%;
+            width: 5%;
+            height: 100%;
+            background: var(--panel-bg);
+            overflow-x: hidden;
+            transition: width 0.3s ease, left 0.3s ease;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+            color: var(--text-color);
+        }
+
+        .panel.open {
+            width: 25%;
+            left: 75%;
+        }
+
+        /* Arrow */
+        .arrow {
+            color: var(--text-color);
+            background-color: green;
+          border-radius: 15px;
+             color: red;
+            position: fixed;
+            bottom: 520px;
+            left: 70%;
+            height: 40px;
+            width: auto;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+
+        .arrow.open {
+            transform: rotate(180deg);
+            left: 70%;
+        }
+
+        .glow {
+            animation: glowEffect 0.6s ease;
+        }
+
+        @keyframes glowEffect {
+            0% {
+                box-shadow: 0 0 0px green;
+            }
+            50% {
+                box-shadow: 0 0 20px 5px limegreen;
+            }
+            100% {
+                box-shadow: 0 0 0px green;
+            }
+        }
+
+        /* Footer */
+        footer {
+            background-color: #222;
+            color: #fff;
+            text-align: center;
+            padding: 15px 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            font-size: 14px;
+            z-index: 2;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 15px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #222;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: orange;
+            border-radius: 10px;
+            border: 3px solid #222;
+        }
+
+        /* Salir button */
+        .salir {
+            position: relative;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            background: #333;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: background 0.3s;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .salir:hover {
+            background: orange;
+        }
+
+        .star {
+            position: absolute;
+            font-size: 20px;
+            animation: fly 1s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes fly {
+            0%   { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-60px) scale(1.5); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .welcome-title {
+                font-size: 2rem;
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                padding: 1rem;
+                gap: 1rem;
+            }
+            
+            .panel.open {
+                width: 80%;
+                left: 20%;
+            }
+            
+            .arrow {
+                left: 80%;
+            }
+            
+            .arrow.open {
+                left: 10%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <button id="theme-toggle" class="theme-btn">🌙</button>
+            <button id="logout-btn" class="logout-btn">Salir</button>
+        </div>
+    </header>
+
+    <main>
+        <div class="welcome-container">
+            <h1 class="welcome-title">Bienvenido a Tu Tienda</h1>
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Buscar productos...">
+                <button id="search-btn">🔍</button>
+            </div>
+        </div>
+
+        <div class="products-grid" id="products-grid">
+            <!-- Las imágenes se generarán con JavaScript -->
+        </div>
+    </main>
+
+    <!-- Lightbox -->
+    <div id="lightbox" class="lightbox">
+        <div class="lightbox-content">
+            <span class="close">&times;</span>
+            <img class="lightbox-img" id="lightbox-img">
+            <p class="lightbox-msg" id="lightbox-msg"></p>
+            <div class="controls">
+                <button id="prev">&#10094;</button>
+                <button id="next">&#10095;</button>
+            </div>
+            <button id="comprar-lightbox" class="comprar-btn">Comprar Ahora</button>
+        </div>
+    </div>
+
+    <!-- Arrow -->
+    <svg xmlns="http://www.w3.org/2000/svg" id="arrow" class="arrow" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+    </svg>
+
+    <!-- Panel -->
+    <div id="panel" class="panel">
+        <button id="cambiar" class="theme-btn">🌞</button>
+        <button class="salir" id="salir">Salir</button>
+        <h2>Panel lateral</h2>
+        <p>Aquí podés poner menú, links, información, etc.</p>
+    </div>
+
+    <footer>
+        © 2025 TuNombre — Hecho con ❤️ por @uwu
+    </footer>
+
+    <script>
+        // Diccionario de búsqueda
+        const diccionario = {
+            zapatillas: ["za", "zap", "zapa", "zapas", "zapatilla", "zapatillas", "calzado", "deporte"],
+            mochila: ["moch", "mochi", "mochila", "mochilas", "bolso", "mochilas", "backpack"],
+            termo: ["ter", "term", "termo", "termos", "termico", "aislante"],
+            tanque: ["tan", "tanq", "tanque", "tanques", "deposito", "contenedor"],
+            fuego: ["fue", "fueg", "fuego", "llama", "flama", "incendio"],
+            luna: ["lun", "luna", "lunar", "satelite", "noche"],
+            algo: ["alg", "algo", "algu", "algun", "alguno", "misterio"],
+            mate: ["mat", "mate", "mates", "yerba", "bebida", "termo"],
+            cuchillo: ["cuc", "cuch", "cuchi", "cuchillo", "cuchillos", "corte", "afilado"],
+            engranaje: ["eng", "engr", "engra", "engran", "engranaje", "engranajes", "rueda", "mecanismo"]
+        };
+
+        // Productos
+        const productos = [
+            { id: 'img1', nombre: 'zapatillas', src: 'assets/imagen1.png', precio: '$89.99', descuento: true },
+            { id: 'img2', nombre: 'mochila', src: 'assets/imagen2.png', precio: '$45.50', descuento: false },
+            { id: 'img3', nombre: 'termo', src: 'assets/imagen3.png', precio: '$32.99', descuento: true },
+            { id: 'img4', nombre: 'tanque', src: 'assets/imagen4.png', precio: '$120.00', descuento: false },
+            { id: 'img5', nombre: 'fuego', src: 'assets/imagen5.png', precio: '$25.75', descuento: true },
+            { id: 'img6', nombre: 'luna', src: 'assets/imagen6.png', precio: '$38.99', descuento: false },
+            { id: 'img7', nombre: 'algo', src: 'assets/imagen7.png', precio: '$19.99', descuento: true },
+            { id: 'img8', nombre: 'mate', src: 'assets/imagen8.png', precio: '$54.99', descuento: false },
+            { id: 'img9', nombre: 'cuchillo', src: 'assets/imagen9.png', precio: '$67.50', descuento: true },
+            { id: 'img10', nombre: 'engranaje', src: 'assets/imagen10.png', precio: '$42.25', descuento: false }
+        ];
+
+        // Mensajes para el lightbox
+        const mensajes = {
+            zapatillas: "¡Ofertón! Zapatillas de última calidad",
+            mochila: "Mochila resistente e impermeable",
+            termo: "Termo que mantiene la temperatura 24h",
+            tanque: "Tanque de almacenamiento robusto",
+            fuego: "Kit de supervivencia con encendedor",
+            luna: "Lámpara lunar decorativa LED",
+            algo: "¡Producto misterioso! Sorpresa garantizada",
+            mate: "Set de mate premium con bombilla",
+            cuchillo: "Cuchillo multiusos profesional",
+            engranaje: "Kit de engranajes de precisión"
+        };
+
+        // Links de compra
+        const linksCompra = {
+            zapatillas: "https://mpago.la/2rGZBAD",
+            mochila: "https://mpago.la/2BKbgdw",
+            termo: "https://mpago.la/11g3rzs",
+            tanque: "https://mpago.la/2aQbWSp",
+            fuego: "https://mpago.la/1ND3Z4m",
+            luna: "https://mpago.la/2rGZBAD",
+            algo: "https://mpago.la/2BKbgdw",
+            mate: "https://mpago.la/11g3rzs",
+            cuchillo: "https://mpago.la/2aQbWSp",
+            engranaje: "https://mpago.la/1ND3Z4m"
+        };
+
+        // Generar productos
+        function generarProductos() {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = '';
+            
+            productos.forEach((producto, index) => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.dataset.nombre = producto.nombre;
+                card.dataset.index = index;
+                
+                card.innerHTML = `
+                    ${producto.descuento ? '<span class="descuento">-10%</span>' : ''}
+                    <img src="${producto.src}" alt="${producto.nombre}" class="product-img" 
+                         onerror="this.src='https://via.placeholder.com/200x200/ff7b00/ffffff?text=${producto.nombre}'">
+                    <div class="product-name">${producto.nombre.charAt(0).toUpperCase() + producto.nombre.slice(1)}</div>
+                    <div class="product-price">${producto.precio}</div>
+                    <button class="comprar-btn" data-producto="${producto.nombre}">COMPRAR</button>
+                `;
+                
+                // Evento para abrir lightbox
+                card.addEventListener('click', (e) => {
+                    if (!e.target.classList.contains('comprar-btn')) {
+                        abrirLightbox(index);
+                    }
+                });
+                
+                // Evento para comprar
+                const comprarBtn = card.querySelector('.comprar-btn');
+                comprarBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    comprarProducto(producto.nombre);
+                });
+                
+                grid.appendChild(card);
+            });
+        }
+
+        // Buscar productos
+        function buscarProductos(termino) {
+            const cards = document.querySelectorAll('.product-card');
+            let encontrados = false;
+            
+            cards.forEach(card => {
+                const nombre = card.dataset.nombre;
+                const palabrasClave = diccionario[nombre] || [nombre];
+                const coincide = palabrasClave.some(palabra => 
+                    palabra.toLowerCase().includes(termino.toLowerCase())
+                );
+                
+                if (coincide || nombre.toLowerCase().includes(termino.toLowerCase())) {
+                    card.classList.remove('hidden');
+                    encontrados = true;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+            
+            if (!encontrados && termino.trim() !== '') {
+                mostrarMensaje('No se encontraron productos que coincidan con tu búsqueda.');
+            }
+        }
+
+        // Mostrar mensaje
+        function mostrarMensaje(mensaje) {
+            let mensajeDiv = document.getElementById('mensaje-busqueda');
+            if (!mensajeDiv) {
+                mensajeDiv = document.createElement('div');
+                mensajeDiv.id = 'mensaje-busqueda';
+                mensajeDiv.style.textAlign = 'center';
+                mensajeDiv.style.padding = '2rem';
+                mensajeDiv.style.color = 'var(--primary-color)';
+                document.querySelector('main').appendChild(mensajeDiv);
+            }
+            mensajeDiv.textContent = mensaje;
+        }
+
+        // Toggle tema
+        function toggleTema() {
+            document.body.classList.toggle('blanco');
+            const themeBtn = document.getElementById('theme-toggle');
+            const cambiarBtn = document.getElementById('cambiar');
+            
+            if (document.body.classList.contains('blanco')) {
+                themeBtn.textContent = '🌙';
+                cambiarBtn.textContent = '🌙';
+            } else {
+                themeBtn.textContent = '🌞';
+                cambiarBtn.textContent = '🌞';
+            }
+        }
+
+        // Lightbox
+        let currentIndex = 0;
+
+        function abrirLightbox(index) {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            const lightboxMsg = document.getElementById('lightbox-msg');
+            const comprarLightbox = document.getElementById('comprar-lightbox');
+            
+            currentIndex = index;
+            const producto = productos[index];
+            
+            lightboxImg.src = producto.src;
+            lightboxImg.alt = producto.nombre;
+            lightboxMsg.textContent = mensajes[producto.nombre];
+            comprarLightbox.dataset.producto = producto.nombre;
+            
+            lightbox.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function cerrarLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function navegarLightbox(direccion) {
+            let nuevoIndex = currentIndex + direccion;
+            
+            if (nuevoIndex < 0) {
+                nuevoIndex = productos.length - 1;
+            } else if (nuevoIndex >= productos.length) {
+                nuevoIndex = 0;
+            }
+            
+            abrirLightbox(nuevoIndex);
+        }
+
+        // Comprar producto
+        function comprarProducto(nombre) {
+            if (confirm(`¿Estás seguro de que quieres comprar ${nombre}?`)) {
+                window.location.href = linksCompra[nombre] || '#';
+            }
+        }
+
+        // Panel lateral
+        function togglePanel() {
+            const arrow = document.getElementById('arrow');
+            const panel = document.getElementById('panel');
+            
+            arrow.classList.toggle('open');
+            panel.classList.toggle('open');
+            
+            // Efecto glow
+            arrow.classList.add('glow');
+            setTimeout(() => arrow.classList.remove('glow'), 600);
+        }
+
+        // Efecto estrellas en botón salir
+        function agregarEstrellas() {
+            const salir = document.getElementById('salir');
+            
+            for (let i = 0; i < 5; i++) {
+                const star = document.createElement('span');
+                star.textContent = "⭐️";
+                star.classList.add('star');
+                star.style.left = `${Math.random() * salir.offsetWidth}px`;
+                star.style.top = `${Math.random() * salir.offsetHeight}px`;
+                salir.appendChild(star);
+                setTimeout(() => star.remove(), 1000);
+            }
+        }
+
+        // Inicializar eventos
+        function inicializarEventos() {
+            // Buscador
+            document.getElementById('search-btn').addEventListener('click', () => {
+                const termino = document.getElementById('search-input').value;
+                buscarProductos(termino);
+            });
+            
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                if (e.target.value.trim() === '') {
+                    document.querySelectorAll('.product-card').forEach(card => {
+                        card.classList.remove('hidden');
+                    });
+                    const mensajeDiv = document.getElementById('mensaje-busqueda');
+                    if (mensajeDiv) mensajeDiv.remove();
+                }
+            });
+            
+            document.getElementById('search-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    buscarProductos(e.target.value);
+                }
+            });
+            
+            // Tema
+            document.getElementById('theme-toggle').addEventListener('click', toggleTema);
+            document.getElementById('cambiar').addEventListener('click', toggleTema);
+            
+            // Logout
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                if (confirm('¿Estás seguro de que quieres salir?')) {
+                    alert('¡Hasta pronto!');
+                }
+            });
+            
+            // Panel
+            document.getElementById('arrow').addEventListener('click', togglePanel);
+            
+            // Lightbox
+            document.querySelector('.close').addEventListener('click', cerrarLightbox);
+            document.getElementById('prev').addEventListener('click', () => navegarLightbox(-1));
+            document.getElementById('next').addEventListener('click', () => navegarLightbox(1));
+            document.getElementById('comprar-lightbox').addEventListener('click', (e) => {
+                comprarProducto(e.target.dataset.producto);
+            });
+            
+            // Cerrar lightbox al hacer click fuera
+            window.addEventListener('click', (e) => {
+                if (e.target === document.getElementById('lightbox')) {
+                    cerrarLightbox();
+                }
+            });
+            
+            // Efecto estrellas en botón salir
+            document.getElementById('salir').addEventListener('mouseenter', agregarEstrellas);
+            document.getElementById('salir').addEventListener('click', () => {
+                window.location.href = "https://google.com";
+            });
+        }
+
+        // Inicializar la página
+        document.addEventListener('DOMContentLoaded', () => {
+            generarProductos();
+            inicializarEventos();
+        });
+    </script>
+</body>
+</html>
